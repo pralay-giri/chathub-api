@@ -19,6 +19,7 @@ const isValidPassword = (enteredPassword, storedPassword) => {
 
 const loginControler = async (req, res) => {
     const { phone, password } = req.query;
+    console.log(req.query);
     try {
         const user = await UserModel.findOne({ phone });
         if (user) {
