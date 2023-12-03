@@ -28,7 +28,7 @@ const expressServer = app.listen(PORT, () => {
 const io = new Server(expressServer, {
     pingTimeout: 60000,
     cors: {
-        origin: "http://localhost:3000",
+        origin: "https://chathub-8hkp.onrender.com",
     },
 });
 
