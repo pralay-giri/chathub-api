@@ -18,7 +18,12 @@ const isValidPassword = (enteredPassword, storedPassword) => {
 };
 
 const loginControler = async (req, res) => {
+<<<<<<< HEAD
     const { gmail, password } = req.query;
+=======
+    const { phone, password } = req.query;
+    console.log(req.query);
+>>>>>>> 875e895d50173e3795f25fce6ecc402b80c8e828
     try {
         const user = await UserModel.findOne({ gmail });
         if (user) {
