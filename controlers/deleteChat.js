@@ -1,11 +1,11 @@
 const UserModel = require("../models/userModel");
 
 const deleteChat = async (req, res) => {
-    const deletePhone = req.query.phone;
+    const gmail = req.query.gmail;
     try {
-        const ownDetails = await UserModel.findOne({ phone: req.user.phone });
-        const userDetails = await UserModel.findOne({phone: deletePhone});
-        if(!ownDetails && !userDetails){
+        const ownDetails = await UserModel.findOne({ gmail: req.user.gmail });
+        const userDetails = await UserModel.findOne({ gmail: gmail });
+        if (!ownDetails && !userDetails) {
             throw new Error("somthing error");
         }
         ownDetails.contactList.remove(userDetails._id);

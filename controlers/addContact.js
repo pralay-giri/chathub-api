@@ -21,7 +21,7 @@ const addContact = async (req, res) => {
             gmail: userGmail,
         }).populate({
             path: "contactList",
-            select: "_id phone",
+            select: "_id phone gmail",
         });
         const allContacts = senderUser.contactList.map(
             (contact) => contact.gmail
