@@ -32,8 +32,4 @@ const io = new Server(expressServer, {
     },
 });
 
-<<<<<<< HEAD
 namespace(io);
-=======
-namespace(io)
->>>>>>> 875e895d50173e3795f25fce6ecc402b80c8e828
