@@ -13,10 +13,11 @@ const userSchema = mongoose.Schema({
     },
     phone: {
         type: String,
-        required: true,
-        unique: true,
         validate: {
             validator: function (value) {
+                if (!value) {
+                    return true;
+                }
                 return validation.isMobilePhone(value, "en-IN");
             },
             message: "invalid phone number",
@@ -24,21 +25,22 @@ const userSchema = mongoose.Schema({
     },
     gmail: {
         type: String,
+        required: true,
+        unique: true,
         validate: {
             validator: function (value) {
                 return validation.isEmail(value);
             },
             message: "invalid gmail",
         },
-        unique: true,
     },
     password: {
         type: String,
         required: true,
     },
-    profile: {
+    publicKey: {
         type: String,
-        default: defaultProfile,
+        required: true,
     },
     status: {
         type: String,

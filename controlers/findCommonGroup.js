@@ -1,38 +1,22 @@
+const GroupSchema = require("../models/groupModel");
 const UserModel = require("../models/userModel");
-const { getGroupFile } = require("../helper/getFile");
 
 const findCommonGroup = async (req, res) => {
     try {
-        const user = await UserModel.findOne({
-            phone: req.query.phone,
-        }).select("_id");
+        const matchingGroups = [];
 
-        const response = await UserModel.findOne({ _id: req.user.id })
-            .select("groupList -_id")
-            .populate({
-                path: "groupList",
-                select: "conversasionId name profile",
-            });
-
-        for (let i = 0; i < response.groupList.length; i++) {
-            await response.groupList[i].populate({
-                path: "conversasionId",
-            });
-            await response.groupList[i].conversasionId.populate({
-                path: "participants",
-                select: "name phone",
-            });
+        const gorups = await GroupSchema.find();
+        for (let i = 0; i < gorups.length; i++) {
+            await gorups[i].populate({ path: "conversasionId" });
+            await gorups[i].conversasionId.populate({ path: "participants" });
         }
 
-        //finding any matching group
-        const matchingGroups = [];
-        response.groupList.forEach((group) => {
+        gorups.forEach((group) => {
             group.conversasionId.participants.forEach((id) => {
-                if (id.equals(user._id)) {
+                if (id.equals(req.user.id)) {
                     matchingGroups.push({
                         id: group._id,
                         name: group.name,
-                        profile: getGroupFile(group.profile),
                         admin: group.admin,
                         participants: group.conversasionId.participants,
                         lastMessage: group.conversasionId.lastMessage,

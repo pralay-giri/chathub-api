@@ -15,16 +15,15 @@ const getGroupControler = async (req, res) => {
         for (const group of user.groupList) {
             await group.populate([
                 { path: "conversasionId", select: "-_id" },
-                { path: "admin", select: "-_id name phone" },
+                { path: "admin", select: "-_id name phone gmail" },
             ]);
             await group.conversasionId.populate({
                 path: "participants",
-                select: "-_id name phone",
+                select: "-_id name phone gmail",
             });
             dataToBeSend.push({
                 id: group._id,
                 name: group.name,
-                profile: getGroupFile(group.profile),
                 admin: group.admin,
                 participants: group.conversasionId.participants,
                 lastMessage: group.conversasionId.lastMessage,
@@ -33,7 +32,6 @@ const getGroupControler = async (req, res) => {
         }
         res.status(200).send(dataToBeSend);
     } catch (error) {
-        console.log(error);
         res.status(204).send("error in creating group");
     }
 };

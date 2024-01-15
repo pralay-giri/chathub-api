@@ -18,16 +18,16 @@ const isValidPassword = (enteredPassword, storedPassword) => {
 };
 
 const loginControler = async (req, res) => {
-    const { phone, password } = req.query;
+    const { gmail, password } = req.query;
     try {
-        const user = await UserModel.findOne({ phone });
+        const user = await UserModel.findOne({ gmail });
         if (user) {
             const isValidUser = isValidPassword(password, user.password);
             if (isValidUser) {
                 const payload = {
                     id: user._id,
                     name: user.name,
-                    phone: user.phone,
+                    gmail: user.gmail,
                 };
                 user.status = "online";
                 await user.save();

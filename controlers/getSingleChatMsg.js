@@ -4,9 +4,9 @@ const messageModel = require("../models/messageModel");
 
 const getSingleChatMsg = async (req, res) => {
     try {
-        const { selectedUserPhone } = req.query;
+        const { gmail } = req.query;
         const selectedContactUser = await UserModel.findOne({
-            phone: selectedUserPhone,
+            gmail,
         });
 
         const conversation = await conversationModel
@@ -45,7 +45,6 @@ const getSingleChatMsg = async (req, res) => {
         res.status(201).send(
             dataTobeSend.length ? dataTobeSend : conversation._id
         );
-        
     } catch (error) {
         console.log(error);
         res.status(404).send(error.message);

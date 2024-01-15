@@ -1,39 +1,30 @@
 const UserModel = require("../models/userModel");
-const path = require("path");
-require('dotenv').config();
+require("dotenv").config();
 const crypto = require("crypto-js");
-const SALT = process.env.SALT; 
+const SALT = process.env.SALT;
 
-const profilesPath = path.join(process.cwd(), "profiles");
-
-const getHashedPassword = (password)=>{
-    const hashedPassword = crypto.SHA256(password, SALT, crypto.enc.Hex);
-    return hashedPassword;
-}
+const getHashedPassword = (password) =>
+    crypto.SHA256(password, SALT, crypto.enc.Hex);
 
 const signinControler = async (req, res) => {
-    const { profilePhoto } = req.files;
-    const { name, phone, password, gmail } = req.body;
-    const profileString = Date.now() + "-" + profilePhoto.name;
-
+    const { name, phone, password, gmail, publicKey } = req.body;
     try {
-        const isUserAvalable = await UserModel.findOne({ phone: "9641462810" });
+        const isUserAvalable = await UserModel.findOne({ gmail });
         if (!isUserAvalable) {
             const user = UserModel({
                 name,
                 phone,
                 gmail,
-                password: getHashedPassword(password), 
-                profile: profileString,
+                password: getHashedPassword(password),
+                publicKey,
             });
-            profilePhoto.mv(path.join(profilesPath, profileString));
-            const responce = await user.save();
-            res.json(responce);
+            await user.save();
+            res.send("sign up successfull");
         } else {
-            res.status(500).send("Number already used");
+            res.status(401).send("error in sign up process");
         }
     } catch (error) {
-        res.status(500).send("error");
+        res.status(500).send("internal server error");
     }
 };
 

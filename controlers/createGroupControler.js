@@ -6,35 +6,31 @@ const path = require("path");
 
 const createGroupControler = async (req, res) => {
     try {
-        // configuring file
-        const { profile } = req.files;
-        const fileName = Date.now() + "-" + profile.name;
+        const { groupName, contacts } = req.body;
+        // its store all the users
+        const participantsUserInfo = [];
 
-        const { groupName } = req.body;
-        const numbers = req.body.numbers.split(",");
-        const participants = [];
-
-        // getting all the participants _id
-        const ownUser = await UserModel.findOne({ _id: req.user.id }).select(
+        // getting all the user data who join the group
+        const admin = await UserModel.findOne({ _id: req.user.id }).select(
             "groupList"
         );
-        participants.push(ownUser);
+        participantsUserInfo.push(admin);
 
-        console.log(numbers);
-        for (const number of numbers) {
-            const user = await UserModel.findOne({ phone: number }).select(
-                "groupList"
-            );
-            participants.push(user);
+        for (let i = 0; i < contacts.length; i++) {
+            const user = await UserModel.findOne({
+                _id: contacts[i]._id,
+            }).select("groupList");
+            if (user) participantsUserInfo.push(user);
         }
-        const participantsPhone = participants.map(
-            (participant) => participant._id
-        );
-        participantsPhone.push(ownUser._id);
+
+        console.log(participantsUserInfo);
+        const participantIds = participantsUserInfo.filter((participant) => {
+            return participant._id !== req.user.id;
+        });
 
         // creating the Conversation Model
         const newConversationModel = new ConversationModel({
-            participants: participantsPhone,
+            participants: participantIds,
             isGroupChat: true,
         });
         const conversationModelResponce = await newConversationModel.save();
@@ -44,27 +40,21 @@ const createGroupControler = async (req, res) => {
             name: groupName,
             conversasionId: conversationModelResponce._id,
             admin: new ObjectId(req.user.id),
-            profile: fileName
         });
 
-        const responce = await newGroupModel.save();
-
-        // adding group id to all the participant's users document
-        for (let i = 0; i < participants.length; i++) {
-            participants[i].groupList.push(new ObjectId(responce._id));
-            await participants[i].save();
-        }
-
-        if (!responce) {
+        const group = await newGroupModel.save();
+        if (!group) {
             throw new Error("can't create group");
         }
 
-        // uploadding file
-        profile.mv(path.join(process.cwd(), "groupProfiles", fileName));
-        return res.status(201).send("group created successfull...");
+        // adding group id to all the participant's users document
+        for (let i = 0; i < participantsUserInfo.length; i++) {
+            participantsUserInfo[i].groupList.push(new ObjectId(group._id));
+            await participantsUserInfo[i].save();
+        }
 
+        return res.status(201).send("group created");
     } catch (error) {
-        console.log(error);
         return res.status(404).send(error);
     }
 };

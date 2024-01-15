@@ -4,9 +4,9 @@ const conversationModel = require("../models/conversationModel");
 
 const newSingleMessage = async (req, res) => {
     try {
-        const { selectedUserPhone, message } = req.body;
+        const { gmail, message } = req.body;
         const selectedContactUser = await UserModel.findOne({
-            phone: selectedUserPhone,
+            gmail,
         });
 
         const conversation = await conversationModel

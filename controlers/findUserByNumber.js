@@ -1,26 +1,19 @@
-const { getFile } = require("../helper/getFile");
+const { response } = require("express");
 const UserModel = require("../models/userModel");
 
 const findUserByNumber = async (req, res) => {
     try {
-        const { numbers } = req.query;
+        const { gmails } = req.query;
         const dataToBeSend = [];
 
-        for (const number of numbers) {
-            const responce = await UserModel.findOne({ phone: number });
+        for (const gmail of gmails) {
+            const responce = await UserModel.findOne({ gmail: gmail }).select(
+                "-password"
+            );
             if (!responce) {
                 throw new Error("not found");
             }
-
-            const { name, phone, gmail, profile, status, lastActive } = responce;
-            dataToBeSend.push({
-                name,
-                phone,
-                gmail,
-                profile: getFile(profile),
-                status,
-                lastActive,
-            });
+            dataToBeSend.push(responce);
         }
         res.status(200).send(dataToBeSend);
     } catch (error) {

@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const auth = require("../meddleware/auth");
 const fileupload = require("express-fileupload");
-router.use(fileupload());
+// router.use(fileupload());
 
 const addContact = require("../controlers/addContact");
 const deleteChat = require("../controlers/deleteChat");
@@ -21,7 +21,7 @@ const getusercredential = require("../controlers/getusercredential");
 const changeNameControler = require("../controlers/changeNameControler");
 const createGroupControler = require("../controlers/createGroupControler");
 const changeAboutControler = require("../controlers/changeAboutControler");
-const changeProfileControler = require("../controlers/changeProfileControler");
+const changePhoneControler = require("../controlers/changePhoneControler");
 const getallcontactControler = require("../controlers/getallcontactControler");
 
 router.get("/createuser/login", loginControler);
@@ -45,7 +45,7 @@ router.delete("/contact/deleteAllChat", auth, deleteAllChat);
 
 router.put("/contact/update/name", auth, changeNameControler);
 router.put("/contact/update/about", auth, changeAboutControler);
-router.put("/contact/update/profile", auth, changeProfileControler);
+router.put("/contact/update/phone", auth, changePhoneControler);
 
 router.all("*", (req, res) => res.status(404).send("not found"));
 

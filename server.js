@@ -1,8 +1,8 @@
 const express = require("express");
 const body_parser = require("body-parser");
 const cors = require("cors");
-const colors = require("colors");
-const db = require("./configuration/config.js");
+require("colors");
+require("./configuration/config.js");
 const router = require("./routers/route");
 const { Server, Socket } = require("socket.io");
 const namespace = require("./socket/nameSpace");
@@ -16,9 +16,9 @@ app.use(
         origin: "https://chathub-8hkp.onrender.com",
     })
 );
-app.use(body_parser.urlencoded({ extended: false }));
-app.use(body_parser.json());
 
+app.use(body_parser.urlencoded({ extended: true }));
+app.use(body_parser.json());
 app.use(router);
 
 const expressServer = app.listen(PORT, () => {
@@ -32,4 +32,4 @@ const io = new Server(expressServer, {
     },
 });
 
-namespace(io)
+namespace(io);

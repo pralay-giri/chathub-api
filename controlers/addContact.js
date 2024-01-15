@@ -4,43 +4,52 @@ const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
 
 const addContact = async (req, res) => {
-    const userNumber = req.user.phone;
-    const { receiverNumber } = req.body;
-    if (userNumber === receiverNumber) {
+    const userGmail = req?.user?.gmail;
+    const receiverGmail = req?.body?.email;
+    if (userGmail === receiverGmail) {
         return res.status(409).send("you can't add");
     }
     try {
+        // finding the user if it exist
         const receiverUser = await UserModel.findOne({
-            phone: receiverNumber,
+            gmail: receiverGmail,
         });
-        if (!receiverUser) throw new Error();
+        if (!receiverUser) throw new Error("not found user");
+
+        // cheacking the all the user in sender contact list
         const senderUser = await UserModel.findOne({
-            phone: userNumber,
+            gmail: userGmail,
         }).populate({
             path: "contactList",
-            select: "-_id phone",
+            select: "_id phone",
         });
         const allContacts = senderUser.contactList.map(
-            (contact) => contact.phone
+            (contact) => contact.gmail
         );
+
         const isAlreadyInContact = allContacts.find((value) => {
-            return value == receiverNumber;
+            return value === receiverGmail;
         });
+
         if (!isAlreadyInContact) {
             const senderUser = await UserModel.findOne({
-                phone: userNumber,
+                gmail: userGmail,
             });
 
             // adding receiverUser_id in contact list
             senderUser.contactList.push(receiverUser._id);
             await senderUser.save();
+            receiverUser.contactList.push(senderUser._id);
+            await receiverUser.save();
 
             // check if the conversation document is present or not
             const isConversationPresent = await ConversationModel.findOne({
                 participants: {
                     $all: [senderUser._id, receiverUser._id],
                 },
-            }).where("isGroupChat").equals(false);
+            })
+                .where("isGroupChat")
+                .equals(false);
 
             // add conversation between this two users if don't have
             if (!isConversationPresent) {

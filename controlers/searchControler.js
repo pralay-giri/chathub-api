@@ -2,7 +2,8 @@ const UserModel = require("../models/userModel");
 const { getFile } = require("../helper/getFile");
 
 const searchControler = async (req, res) => {
-    const { phone } = req.query;
+    console.log(req.gmail);
+    const { gmail } = req.query;
     try {
         const responce = await UserModel.findOne({ _id: req.user.id })
             .select("contactList -_id")
@@ -13,18 +14,8 @@ const searchControler = async (req, res) => {
 
         for (let i = 0; i < responce.contactList.length; i++) {
             const item = responce.contactList[i];
-            if (item.phone === phone) {
-                const { name, phone, gmail, profile, status, lastActive } =
-                    item;
-                const obj = {
-                    name,
-                    phone,
-                    gmail,
-                    profile: getFile(profile),
-                    status,
-                    lastActive,
-                };
-                return res.status(201).send(obj);
+            if (item.gmail === gmail) {
+                return res.status(201).send(item);
             }
         }
         throw new Error("not found");
